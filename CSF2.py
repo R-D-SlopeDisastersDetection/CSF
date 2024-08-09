@@ -7,10 +7,21 @@ import open3d as o3d
 
 
 class CSF2(object):
-
     def __init__(self, inputfile: string, outputfile: string, filetype: string,
                  bSloopSmooth: bool = False, cloth_resolution: float = 0.5, rigidness: float = 3,
                  time_step: float = 0.65, class_threshold: float = 0.03, interations: int = 500):
+        """
+        init for this class
+        :param inputfile: input file path
+        :param outputfile:  output file path
+        :param filetype:    file type
+        :param bSloopSmooth: 是否进行边坡后处理。当有陡变地形是设置为ture
+        :param cloth_resolution: 布料网格分辨率，一般与点云间距相当，单位为m
+        :param rigidness:   布料刚性参数，可选值1，2，3. 1表示平坦地形。2表示有缓坡的地形。3表示有较陡的地形（比如山地）。
+        :param time_step:
+        :param class_threshold: 点云与布料模拟点的距离阈值
+        :param interations: 最大迭代次数
+        """
         self.csf = CSF.CSF()
         self.inputfile = inputfile
         self.outputfile = outputfile
@@ -31,29 +42,56 @@ class CSF2(object):
         self.non_ground = CSF.VecInt()
         
     def process(self):
+        """
+        数据处理
+        :return:
+        """
         if self.filetype == 'las':
             self.las_process()
+        if self.filetype == 'ply':
+            self.ply_process()
 
 
     def view_cloud(self):
+        """
+        可视化
+        :return:
+        """
         if self.filetype=='las':
             self.las_view_cloud()
 
 
     def las_process(self):
-        inFile = laspy.read(self.inputfile)
-        points = inFile.points
-        xyz = np.vstack((inFile.x, inFile.y, inFile.z)).transpose()
+        """
+        las格式数据处理
+        :return:
+        """
+        infile = laspy.read(self.inputfile)
+        points = infile.points
+        xyz = np.vstack((infile.x, infile.y, infile.z)).transpose()
 
         self.csf.setPointCloud(xyz)
         self.csf.do_filtering(self.ground, self.non_ground)
 
-        outFile = laspy.LasData(inFile.header)
+        outFile = laspy.LasData(infile.header)
         outFile.points = points[np.array(self.ground)]
         outFile.write(self.outputfile)
 
+    # def ply_process(self):
+    #     infile = o3d.io.read_point_cloud(self.inputfile)
+    #     points = infile.points
+    #
+    #     self.csf.setPointCloud(points)
+    #     self.csf.do_filtering(self.ground, self.non_ground)
+
+
+
 
     def las_view_cloud(self):
+        """
+        las格式数据可视化
+        :return:
+        """
         las = laspy.read(self.outputfile)
         points = np.stack([las.x, las.y, las.z]).transpose()
         pcd = o3d.geometry.PointCloud()
@@ -71,6 +109,7 @@ class CSF2(object):
 
 
     def set_inputfile(self, inputfile: str):
+
         self.inputfile = inputfile
 
     def get_inputfile(self):
@@ -90,36 +129,42 @@ class CSF2(object):
 
     def set_bSloopSmooth(self, bSloopSmooth: bool):
         self.bSloopSmooth = bSloopSmooth
+        self.csf.params.bSloopSmooth = self.bSloopSmooth
 
     def get_bSloopSmooth(self):
         return self.bSloopSmooth
 
     def set_cloth_resolution(self, cloth_resolution: float):
         self.cloth_resolution = cloth_resolution
+        self.csf.params.cloth_resolution = self.cloth_resolution
 
     def get_cloth_resolution(self):
         return self.cloth_resolution
 
     def set_rigidness(self, rigidness: float):
         self.rigidness = rigidness
+        self.csf.params.rigidness = self.rigidness
 
     def get_rigidness(self):
         return self.rigidness
 
     def set_time_step(self, time_step: float):
         self.time_step = time_step
+        self.csf.params.time_step = self.time_step
 
     def get_time_step(self):
         return self.time_step
 
     def set_class_threshold(self, class_threshold: float):
         self.class_threshold = class_threshold
+        self.csf.params.class_threshold = self.class_threshold
 
     def get_class_threshold(self):
         return self.class_threshold
 
     def set_interations(self, interations: int):
         self.interations = interations
+        self.csf.params.interations = self.interations
 
     def get_interations(self):
         return self.interations
