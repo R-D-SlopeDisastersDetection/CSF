@@ -68,3 +68,58 @@ class CSF2(object):
         pcd.colors = o3d.utility.Vector3dVector(colors)
 
         o3d.visualization.draw_geometries([pcd])
+
+
+    def set_inputfile(self, inputfile: str):
+        self.inputfile = inputfile
+
+    def get_inputfile(self):
+        return self.inputfile
+
+    def set_outputfile(self, outputfile: str):
+        self.outputfile = outputfile
+
+    def get_outputfile(self):
+        return self.outputfile
+
+    def set_filetype(self, filetype):
+        self.filetype = filetype
+
+    def get_filetype(self):
+        return self.filetype
+
+    def set_bSloopSmooth(self, bSloopSmooth: bool):
+        self.bSloopSmooth = bSloopSmooth
+
+    def get_bSloopSmooth(self):
+        return self.bSloopSmooth
+
+    def set_cloth_resolution(self, cloth_resolution: float):
+        self.cloth_resolution = cloth_resolution
+
+    def get_cloth_resolution(self):
+        return self.cloth_resolution
+
+    def set_rigidness(self, rigidness: float):
+        self.rigidness = rigidness
+
+    def get_rigidness(self):
+        return self.rigidness
+
+    def set_time_step(self, time_step: float):
+        self.time_step = time_step
+
+    def get_time_step(self):
+        return self.time_step
+
+    def set_class_threshold(self, class_threshold: float):
+        self.class_threshold = class_threshold
+
+    def get_class_threshold(self):
+        return self.class_threshold
+
+    def set_interations(self, interations: int):
+        self.interations = interations
+
+    def get_interations(self):
+        return self.interations
