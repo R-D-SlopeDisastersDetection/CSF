@@ -51,15 +51,16 @@ class CSF2(object):
         if self.filetype == 'ply':
             self.ply_process()
 
-
     def view_cloud(self):
         """
         可视化
         :return:
         """
-        if self.filetype=='las':
+        if self.filetype == 'las':
             self.las_view_cloud()
 
+        if self.filetype == 'ply':
+            self.ply_view_cloud()
 
     def las_process(self):
         """
@@ -73,19 +74,34 @@ class CSF2(object):
         self.csf.setPointCloud(xyz)
         self.csf.do_filtering(self.ground, self.non_ground)
 
-        outFile = laspy.LasData(infile.header)
-        outFile.points = points[np.array(self.ground)]
-        outFile.write(self.outputfile)
+        outfile = laspy.LasData(infile.header)
+        outfile.points = points[np.array(self.ground)]
+        outfile.write(self.outputfile)
 
-    # def ply_process(self):
-    #     infile = o3d.io.read_point_cloud(self.inputfile)
-    #     points = infile.points
-    #
-    #     self.csf.setPointCloud(points)
-    #     self.csf.do_filtering(self.ground, self.non_ground)
+    def ply_process(self):
+        infile = o3d.io.read_point_cloud(self.inputfile)
+        xyz = np.array(infile.points)
+        colors = np.array(infile.colors)
+        normals = np.array(infile.normals)
 
+        self.csf.setPointCloud(xyz)
+        self.csf.do_filtering(self.ground, self.non_ground)
 
+        outfile = o3d.geometry.PointCloud()
+        tmp = np.array(self.ground)
+        outfile.points = o3d.utility.Vector3dVector(xyz[tmp])
+        outfile.colors = o3d.utility.Vector3dVector(colors[tmp])
+        outfile.normals = o3d.utility.Vector3dVector(normals[tmp])
 
+        o3d.io.write_point_cloud(self.outputfile, outfile)
+
+    def ply_view_cloud(self):
+        """
+        ply格式数据可视化
+        :return:
+        """
+        infile = o3d.io.read_point_cloud(self.outputfile)
+        o3d.visualization.draw_geometries([infile])
 
     def las_view_cloud(self):
         """
@@ -97,16 +113,17 @@ class CSF2(object):
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
 
-
-        if las.red.max() >= 256: las.red >>= 8
-        if las.green.max() >= 256: las.green >>= 8
-        if las.blue.max() >= 256: las.blue >>= 8
+        if las.red.max() >= 256:
+            las.red >>= 8
+        if las.green.max() >= 256:
+            las.green >>= 8
+        if las.blue.max() >= 256:
+            las.blue >>= 8
         colors = np.stack([las.red * 256 / 65535, las.green * 256 / 65535, las.blue * 256 / 65535], axis=0).transpose(
             (1, 0))
         pcd.colors = o3d.utility.Vector3dVector(colors)
 
         o3d.visualization.draw_geometries([pcd])
-
 
     def set_inputfile(self, inputfile: str):
 
