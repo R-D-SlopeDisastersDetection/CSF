@@ -18,7 +18,7 @@ class CSF2(object):
         :param bSloopSmooth: 是否进行边坡后处理。当有陡变地形是设置为ture
         :param cloth_resolution: 布料网格分辨率，一般与点云间距相当，单位为m
         :param rigidness:   布料刚性参数，可选值1，2，3. 1表示平坦地形。2表示有缓坡的地形。3表示有较陡的地形（比如山地）。
-        :param time_step:
+        :param time_step:   密度峰值之间的时间步长
         :param class_threshold: 点云与布料模拟点的距离阈值
         :param interations: 最大迭代次数
         """
