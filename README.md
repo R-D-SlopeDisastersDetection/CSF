@@ -35,4 +35,5 @@ python 3.9
 numpy 1.22.4
 open3d 0.18.0
 cloth-simulation-filter 1.1.5
+laspy 2.5.4
 ~~~
